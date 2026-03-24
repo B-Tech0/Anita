@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Us Machine 🫶</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e17;
+    --surface: #1a1828;
+    --surface2: #232136;
+    --accent: #ff6b6b;
+    --accent2: #ffd93d;
+    --accent3: #6bcb77;
+    --accent4: #4d96ff;
+    --text: #fffffe;
+    --muted: #a7a9be;
+    --glass: rgba(255,255,255,0.04);
+    --glow: rgba(255,107,107,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+    padding: 20px;
+  }
+
+  /* Stars background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 80%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 10% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 50%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 35% 45%, rgba(255,255,255,0.15) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 65% 70%, rgba(255,255,255,0.25) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 25%, rgba(255,255,255,0.2) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+    letter-spacing: -1px;
+  }
+
+  .page-title span {
+    color: var(--accent);
+  }
+
+  .subtitle {
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 36px;
+    font-size: 0.95rem;
+    font-style: italic;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* VENDING MACHINE */
+  .machine {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+    background: linear-gradient(160deg, #2a2640 0%, #1a1828 60%, #13121f 100%);
+    border-radius: 28px 28px 20px 20px;
+    border: 2px solid rgba(255,255,255,0.08);
+    box-shadow:
+      0 0 60px rgba(255,107,107,0.12),
+      0 40px 80px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.1);
+    overflow: hidden;
+  }
+
+  /* Top panel with logo */
+  .machine-header {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+    padding: 18px 24px 14px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .machine-header::before {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 100px; height: 100px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+  }
+
+  .machine-header::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: 10px;
+    width: 80px; height: 80px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 50%;
+  }
+
+  .machine-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+  }
+
+  .machine-tagline {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Filter tabs */
+  .filter-row {
+    display: flex;
+    gap: 6px;
+    padding: 14px 16px 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .filter-row::-webkit-scrollbar { display: none; }
+
+  .filter-btn {
+    flex-shrink: 0;
+    padding: 5px 13px;
+    border-radius: 20px;
+    border: 1.5px solid rgba(255,255,255,0.1);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* Display window */
+  .display-window {
+    margin: 0 16px;
+    background: #0b0a14;
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,0.07);
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 4px 20px rgba(0,0,0,0.5);
+  }
+
+  .display-window::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  }
+
+  /* Scanline effect */
+  .display-window::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .display-idle {
+    text-align: center;
+    padding: 30px 20px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .display-idle .big-emoji {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 12px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .display-idle p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .activity-card {
+    padding: 28px 24px;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .activity-category {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .activity-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.3rem, 4vw, 1.7rem);
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .activity-desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.65;
+    margin-bottom: 16px;
+  }
+
+  .activity-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.07);
+    color: var(--muted);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* Slots grid (visual only) */
+  .slots-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    padding: 14px 16px;
+  }
+
+  .slot {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    padding: 8px 4px;
+    text-align: center;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .slot:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.2);
+    transform: scale(1.05);
+  }
+
+  .slot-label {
+    font-size: 0.58rem;
+    color: var(--muted);
+    margin-top: 3px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* Dispense button */
+  .dispense-area {
+    padding: 12px 16px 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .dispense-btn {
+    flex: 1;
+    padding: 16px;
+    background: linear-gradient(135deg, #ff6b6b, #ff4757);
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(255,107,107,0.35);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dispense-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.4s;
+  }
+
+  .dispense-btn:hover::before { left: 150%; }
+
+  .dispense-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(255,107,107,0.5);
+  }
+
+  .dispense-btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .save-btn {
+    width: 50px; height: 50px;
+    background: var(--surface2);
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    color: var(--muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .save-btn:hover {
+    background: rgba(255,217,61,0.15);
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  .save-btn.saved {
+    background: rgba(255,217,61,0.15);
+    border-color: var(--accent2);
+    color: var(--accent2);
+    animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+
+  /* Coin slot decor */
+  .machine-footer {
+    background: rgba(0,0,0,0.3);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .coin-slot {
+    width: 60px;
+    height: 8px;
+    background: #0b0a14;
+    border-radius: 4px;
+    border: 1.5px solid rgba(255,255,255,0.1);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+  }
+
+  .machine-lights {
+    display: flex;
+    gap: 6px;
+  }
+
+  .light {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  .light:nth-child(1) { background: var(--accent); animation-delay: 0s; }
+  .light:nth-child(2) { background: var(--accent2); animation-delay: 0.4s; }
+  .light:nth-child(3) { background: var(--accent3); animation-delay: 0.8s; }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Saved list */
+  .saved-section {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+    margin-top: 20px;
+  }
+
+  .saved-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+
+  .saved-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .clear-btn {
+    font-size: 0.75rem;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .clear-btn:hover { opacity: 1; }
+
+  .saved-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .saved-item {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideIn 0.3s ease;
+  }
+
+  .saved-emoji { font-size: 1.4rem; flex-shrink: 0; }
+
+  .saved-info { flex: 1; }
+  .saved-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .saved-cat {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .remove-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+    transition: color 0.2s;
+    opacity: 0.5;
+  }
+  .remove-btn:hover { color: var(--accent); opacity: 1; }
+
+  /* Dispensing animation overlay */
+  .dispense-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(11,10,20,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .dispense-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .dispense-spinner {
+    font-size: 2.5rem;
+    animation: spin 0.5s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Responsive */
+  @media (max-width: 500px) {
+    .slots-grid { grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">The <span>Us</span> Machine 🫶</h1>
+<p class="subtitle">insert love, receive adventure — naija style 🇳🇬</p>
+
+<div class="machine">
+  <div class="machine-header">
+    <div class="machine-logo">Us Machine</div>
+    <div class="machine-tagline">Naija Couple Edition 🇳🇬</div>
+  </div>
+
+  <!-- Category filters -->
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="setFilter('all', this)">✨ All</button>
+    <button class="filter-btn" onclick="setFilter('outdoor', this)">🌴 Outdoor</button>
+    <button class="filter-btn" onclick="setFilter('cozy', this)">🏠 Cozy</button>
+    <button class="filter-btn" onclick="setFilter('food', this)">🍽️ Food</button>
+    <button class="filter-btn" onclick="setFilter('creative', this)">🎨 Creative</button>
+    <button class="filter-btn" onclick="setFilter('adventure', this)">⚡ Adventure</button>
+    <button class="filter-btn" onclick="setFilter('budget', this)">💸 Budget</button>
+  </div>
+
+  <!-- Display window -->
+  <div class="display-window" id="display">
+    <div class="display-idle" id="idleState">
+      <span class="big-emoji">🎰</span>
+      <p>Pick a vibe above<br>then hit <strong style="color:white">Dispense</strong> for your next Naija date idea 🇳🇬</p>
+    </div>
+    <div class="activity-card" id="activityCard" style="display:none"></div>
+    <div class="dispense-overlay" id="dispenseOverlay">
+      <span class="dispense-spinner">⚙️</span>
+    </div>
+  </div>
+
+  <!-- Slot grid (decorative + clickable categories) -->
+  <div class="slots-grid">
+    <div class="slot" onclick="setFilterByEmoji('outdoor')">🌴<div class="slot-label">Outdoor</div></div>
+    <div class="slot" onclick="setFilterByEmoji('cozy')">🏠<div class="slot-label">Cozy</div></div>
+    <div class="slot" onclick="setFilterByEmoji('food')">🍢<div class="slot-label">Chop</div></div>
+    <div class="slot" onclick="setFilterByEmoji('creative')">🎨<div class="slot-label">Creative</div></div>
+    <div class="slot" onclick="setFilterByEmoji('adventure')">⚡<div class="slot-label">Owambe</div></div>
+    <div class="slot" onclick="setFilter('all', null)">🎲<div class="slot-label">Random</div></div>
+    <div class="slot" onclick="setFilterByEmoji('night')">🌙<div class="slot-label">Night</div></div>
+    <div class="slot" onclick="setFilterByEmoji('budget')">💸<div class="slot-label">Free</div></div>
+  </div>
+
+  <!-- Dispense -->
+  <div class="dispense-area">
+    <button class="dispense-btn" onclick="dispense()">🎰 Dispense!</button>
+    <button class="save-btn" id="saveBtn" onclick="saveActivity()" title="Save this idea">🔖</button>
+  </div>
+
+  <div class="machine-footer">
+    <div class="machine-lights">
+      <div class="light"></div>
+      <div class="light"></div>
+      <div class="light"></div>
+    </div>
+    <div class="coin-slot"></div>
+    <div style="font-size:0.65rem; color: rgba(255,255,255,0.2); font-family:'DM Sans'">MADE WITH 💛</div>
+  </div>
+</div>
+
+<!-- Saved activities -->
+<div class="saved-section" id="savedSection" style="display:none">
+  <div class="saved-header">
+    <span class="saved-title">📋 Your List</span>
+    <button class="clear-btn" onclick="clearAll()">clear all</button>
+  </div>
+  <div class="saved-list" id="savedList"></div>
+</div>
+
+<script>
+const activities = [
+  // Outdoor
+  { emoji: '🌅', title: 'Bar Beach Sunrise', category: 'outdoor', color: '#ff8e53', desc: 'Wake up early, grab puff puff and hot tea from a roadside seller, and catch the sunrise at Bar Beach or Elegushi. No Instagram. Just you two and the waves.', tags: ['morning', 'romantic', 'free'] },
+  { emoji: '🚤', title: 'Boat Cruise on the Lagoon', category: 'outdoor', color: '#4d96ff', desc: 'Book a short boat ride on Lagos Lagoon. Watch the city skyline from the water, feel the breeze, take embarrassingly nice photos together.', tags: ['lagos', 'scenic', 'outing'] },
+  { emoji: '🌴', title: 'Lekki Conservation Centre', category: 'outdoor', color: '#6bcb77', desc: 'Walk the longest canopy walkway in Africa together. It\'s genuinely breathtaking — and slightly terrifying. Hold hands. Scream a little.', tags: ['lagos', 'nature', 'active'] },
+  { emoji: '🏖️', title: 'Private Beach Day', category: 'outdoor', color: '#ffd93d', desc: 'Pack a cooler with drinks and snacks, find a quieter beach (Tarkwa Bay, Ilashe, or Alpha Beach), and spend the day doing absolutely nothing important.', tags: ['lagos', 'relaxing', 'beach'] },
+  { emoji: '🌿', title: 'Morning Market Run', category: 'outdoor', color: '#6bcb77', desc: 'Hit Mile 12, Oyingbo, or your local market early. Each pick 3 random ingredients. Go home and see what meal you can create together.', tags: ['food', 'morning', 'creative'] },
+  { emoji: '🧺', title: 'Picnic at Millennium Park', category: 'outdoor', color: '#ff8e53', desc: 'If you\'re in Abuja, pack a mat, some chin chin, juice and fruit, and have a proper picnic at Millennium Park. Peaceful, green, and underrated.', tags: ['abuja', 'peaceful', 'budget'] },
+
+  // Cozy
+  { emoji: '🎬', title: 'Nollywood Movie Marathon', category: 'cozy', color: '#4d96ff', desc: 'Pick 3 classic Nollywood films — one old school (Living in Bondage era), one 2010s, one recent. Rate them, argue about them, quote them forever.', tags: ['night', 'naija', 'budget'] },
+  { emoji: '🎙️', title: 'Afrobeats Karaoke Night', category: 'cozy', color: '#fd79a8', desc: 'Pull up the lyrics to your favourite Burna Boy, Wizkid, Tems, or Davido songs and take turns performing. No shame allowed. Full performance energy.', tags: ['music', 'fun', 'free'] },
+  { emoji: '🃏', title: 'Whot & Card Game Night', category: 'cozy', color: '#ffd93d', desc: 'Break out Whot, Ludo, Draught, or Ayo. Best of 5. Winner gets to choose the next date spot. Loser buys suya.', tags: ['playful', 'naija', 'budget'] },
+  { emoji: '🛁', title: 'Pamper Night In', category: 'cozy', color: '#fd79a8', desc: 'Face masks, shea butter massages, candles, and an Afrobeats lo-fi playlist. Make zobo or chapman. Full relaxation mode. Phones off.', tags: ['romantic', 'relaxing', 'budget'] },
+  { emoji: '☕', title: 'Café Hopping in VI or Ikoyi', category: 'cozy', color: '#e17055', desc: 'Hit 2–3 cafés in Victoria Island or Ikoyi. Try something different at each one — a smoothie, a shawarma, a fancy coffee. Rate them honestly.', tags: ['lagos', 'food', 'explore'] },
+  { emoji: '📖', title: 'Tell Me Your Story Night', category: 'cozy', color: '#a29bfe', desc: 'No phones. Take turns sharing a memory the other has never heard — childhood, embarrassing, scary, funny. No judgement. Just listening.', tags: ['intimate', 'meaningful', 'free'] },
+
+  // Food
+  { emoji: '🍢', title: 'Suya Date Night', category: 'food', color: '#ff6b6b', desc: 'Find the best suya mallam in your area (you know the one). Get suya, kilishi, and roasted yam. Eat outside under the night sky. This is peak romance.', tags: ['naija', 'night', 'street food'] },
+  { emoji: '🥘', title: 'Cook-Off: Jollof Battle', category: 'food', color: '#ffd93d', desc: 'Each of you makes a pot of jollof rice your own way. Invite a neutral judge (or judge each other blindly). The stakes are your jollof reputation. No pressure.', tags: ['naija', 'fun', 'challenge'] },
+  { emoji: '🍲', title: 'Try a New Tribe\'s Food', category: 'food', color: '#e17055', desc: 'Cook a dish from a Nigerian ethnicity neither of you has tried cooking before — Efik, Edo, Tiv, Igala, Nupe. Look up the recipe together.', tags: ['creative', 'naija', 'cultural'] },
+  { emoji: '🌮', title: 'Blind Naija Snack Test', category: 'food', color: '#6bcb77', desc: 'Blindfolded tasting of Nigerian snacks — chin chin, boli, puff puff, kuli kuli, coconut candy, robo. Guess each one. Loser buys next round of snacks.', tags: ['playful', 'game', 'naija'] },
+  { emoji: '🍽️', title: 'Fine Dining Treat', category: 'food', color: '#fd79a8', desc: 'Dress up and book a table at a restaurant you\'ve never been to — Nok by Alara, Craft Grill, Cactus, The View. No price checking. One special evening.', tags: ['romantic', 'lagos', 'outing'] },
+  { emoji: '🥤', title: 'Chapman & Pepper Soup Night', category: 'food', color: '#ff8e53', desc: 'Make Chapman at home (Fanta, Ribena, Angostura bitters, fruits) and cook a pot of catfish or goat pepper soup. Domestic bliss.', tags: ['naija', 'cozy', 'budget'] },
+
+  // Creative
+  { emoji: '🎨', title: 'Paint Each Other\'s Portraits', category: 'creative', color: '#fd79a8', desc: 'Get cheap canvases from Yaba market or Balogun. 20 minutes to paint each other. The worse the better — frame them and hang them up forever.', tags: ['funny', 'budget', 'keepsake'] },
+  { emoji: '📷', title: 'Naija Neighbourhood Photo Walk', category: 'creative', color: '#4d96ff', desc: 'Walk your street with prompts: colour, texture, joy, hustle, contrast. Document your city through your eyes. Compare photos after — it\'ll surprise you.', tags: ['outdoor', 'creative', 'free'] },
+  { emoji: '🎵', title: 'Build Your Relationship Playlist', category: 'creative', color: '#6bcb77', desc: 'Take turns adding songs — Afrobeats, highlife, R&B, whatever. Songs that remind you of each other, of your firsts, your moments. No vetoes allowed.', tags: ['music', 'meaningful', 'free'] },
+  { emoji: '✍️', title: 'Write Each Other Love Notes', category: 'creative', color: '#a29bfe', desc: 'Sit together but don\'t peek. Write a heartfelt or hilariously dramatic love letter Nigerian movie style. Read them aloud. Tears or laughter — either works.', tags: ['romantic', 'naija', 'free'] },
+  { emoji: '🎭', title: 'Skit Night: Act Like a Naija Movie', category: 'creative', color: '#ffd93d', desc: 'Pick a classic Nollywood scene or a trending Instagram skit and recreate it together. Full acting, full drama, full costumes if possible. Record it.', tags: ['silly', 'naija', 'fun'] },
+
+  // Adventure
+  { emoji: '🗺️', title: 'Island to Mainland Adventure', category: 'adventure', color: '#ff6b6b', desc: 'Cross from Island to Mainland (or vice versa) and explore a neighbourhood you\'ve never been to. Find food, find art, find chaos. That\'s Lagos.', tags: ['lagos', 'explore', 'spontaneous'] },
+  { emoji: '🎯', title: 'Try Something New Together', category: 'adventure', color: '#ffd93d', desc: 'Bowling at Circle Mall, go-karting, mini golf, pottery, an art class in Lagos or Abuja. The point is to be bad at it together and laugh the whole time.', tags: ['active', 'fun', 'outing'] },
+  { emoji: '🌃', title: 'Owambe Crash Lol', category: 'adventure', color: '#4d96ff', desc: 'Find a neighbourhood owambe (or a friend\'s friend\'s party), dress up in your best aso-ebi energy, eat the jollof, dance, and leave before anyone notices you\'re not invited.', tags: ['naija', 'night', 'spontaneous'] },
+  { emoji: '🎪', title: 'Catch a Live Event', category: 'adventure', color: '#6bcb77', desc: 'Look up what\'s on this weekend — an Afrobeats concert, a comedy show at Eko Hotel, an art exhibition, a food festival. Show up with zero expectations.', tags: ['lagos', 'social', 'outing'] },
+  { emoji: '🏙️', title: 'Night Drive with Good Music', category: 'adventure', color: '#e17055', desc: 'Lagos at 11pm, windows down, Afrobeats playlist on full blast. No destination. Just drive through the quiet mainland or Third Mainland Bridge and talk.', tags: ['lagos', 'night', 'romantic'] },
+
+  // Budget / Free
+  { emoji: '🌙', title: 'Rooftop Stargazing', category: 'budget', color: '#a29bfe', desc: 'Grab a mat, some zobo or Pepsi, and get to a rooftop after 9pm. Away from generator fumes. Look up. Download a star map app. Talk till midnight.', tags: ['free', 'romantic', 'night'] },
+  { emoji: '💸', title: '₦0 Date Challenge', category: 'budget', color: '#6bcb77', desc: 'No spending. Cook what\'s in the house, play games you already have, take a walk, tell stories. The challenge is making it unforgettable without spending a kobo.', tags: ['free', 'creative', 'challenge'] },
+  { emoji: '🚌', title: 'Danfo Adventure', category: 'budget', color: '#ffd93d', desc: 'Take a danfo to somewhere neither of you has been before. Explore the street, eat local, take photos. Budget: under ₦2,000 each. Part of the fun is figuring it out.', tags: ['lagos', 'explore', 'budget'] },
+];
+
+let currentFilter = 'all';
+let currentActivity = null;
+let savedActivities = JSON.parse(localStorage.getItem('us-machine-saved') || '[]');
+
+function setFilter(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  else {
+    const allBtn = document.querySelector('.filter-btn');
+    if (allBtn) allBtn.classList.add('active');
+  }
+}
+
+function setFilterByEmoji(cat) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+}
+
+function dispense() {
+  const pool = currentFilter === 'all' 
+    ? activities 
+    : activities.filter(a => a.category === currentFilter || a.tags?.includes(currentFilter));
+  
+  if (!pool.length) return;
+
+  const overlay = document.getElementById('dispenseOverlay');
+  overlay.classList.add('active');
+
+  setTimeout(() => {
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    currentActivity = pick;
+
+    document.getElementById('idleState').style.display = 'none';
+    const card = document.getElementById('activityCard');
+    card.style.display = 'block';
+
+    card.innerHTML = `
+      <div class="activity-category" style="color:${pick.color}">${pick.category.toUpperCase()} · ${pick.emoji}</div>
+      <div class="activity-title">${pick.title}</div>
+      <div class="activity-desc">${pick.desc}</div>
+      <div class="activity-tags">${pick.tags.map(t => `<span class="tag">#${t}</span>`).join('')}</div>
+    `;
+
+    // Reset save button
+    const saveBtn = document.getElementById('saveBtn');
+    const alreadySaved = savedActivities.some(a => a.title === pick.title);
+    saveBtn.textContent = alreadySaved ? '✅' : '🔖';
+    saveBtn.classList.toggle('saved', alreadySaved);
+
+    overlay.classList.remove('active');
+  }, 600);
+}
+
+function saveActivity() {
+  if (!currentActivity) return;
+  const saveBtn = document.getElementById('saveBtn');
+  const alreadySaved = savedActivities.some(a => a.title === currentActivity.title);
+  
+  if (alreadySaved) return;
+
+  savedActivities.push(currentActivity);
+  localStorage.setItem('us-machine-saved', JSON.stringify(savedActivities));
+  saveBtn.textContent = '✅';
+  saveBtn.classList.add('saved');
+  renderSaved();
+}
+
+function removeActivity(title) {
+  savedActivities = savedActivities.filter(a => a.title !== title);
+  localStorage.setItem('us-machine-saved', JSON.stringify(savedActivities));
+  renderSaved();
+}
+
+function clearAll() {
+  savedActivities = [];
+  localStorage.setItem('us-machine-saved', JSON.stringify(savedActivities));
+  renderSaved();
+}
+
+function renderSaved() {
+  const section = document.getElementById('savedSection');
+  const list = document.getElementById('savedList');
+
+  if (!savedActivities.length) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+  list.innerHTML = savedActivities.map(a => `
+    <div class="saved-item">
+      <span class="saved-emoji">${a.emoji}</span>
+      <div class="saved-info">
+        <div class="saved-name">${a.title}</div>
+        <div class="saved-cat">${a.category} · ${a.tags.slice(0,2).map(t => '#'+t).join(' ')}</div>
+      </div>
+      <button class="remove-btn" onclick="removeActivity('${a.title.replace(/'/g,"\\'")}')">✕</button>
+    </div>
+  `).join('');
+}
+
+// Init
+renderSaved();
+</script>
+</body>
+</html>
